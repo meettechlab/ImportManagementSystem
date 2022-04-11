@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:importmanagementsoftware/api/pdf_api.dart';
+import 'package:importmanagementsoftware/api/pdf_invoice_api_stone_purchase.dart';
+import 'package:importmanagementsoftware/model/invoiceStonePurchase.dart';
 import 'package:importmanagementsoftware/model/lc.dart';
 import 'package:importmanagementsoftware/screens/individual_lc_entry_screen.dart';
+import 'package:importmanagementsoftware/screens/individual_lc_update_screen.dart';
 import 'package:intl/intl.dart';
 
 import '../model/company.dart';
@@ -20,7 +27,6 @@ class IndividualLCHistoryScreen extends StatefulWidget {
 }
 
 class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
-
   double _totalStock = 0.0;
   double _totalAmount = 0.0;
   final lcOpenPriceEditingController = new TextEditingController();
@@ -31,31 +37,33 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
   bool? _process;
   int? _count;
   bool disFAB = false;
-
+  String rate = "0";
+  String lcOpenPrice = "0";
+  String dutyCost = "0";
+  String speedMoney = "0";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _process = false;
     _count = 1;
-    final tempBox = Hive.box('lcs')
-        .values
-        .where((c) => c.lcNumber
-        .toLowerCase()
-        .contains(widget.lcModel.lcNumber.toLowerCase()));
+    final tempBox = Hive.box('lcs').values.where((c) =>
+        c.lcNumber.toLowerCase() == (widget.lcModel.lcNumber.toLowerCase()));
     final tempBoxList = tempBox.toList();
     for (var i = 0; i < tempBoxList.length; i++) {
       final _temp = tempBoxList[i] as LC;
       setState(() {
-        _totalStock = (double.parse(_totalStock.toString()) + double.parse(_temp.cft));
+        _totalStock =
+            (double.parse(_totalStock.toString()) + double.parse(_temp.cft));
       });
     }
     final tempItem = tempBox.last as LC;
-    if(double.parse(tempItem.totalBalance) > 0){
+    if (double.parse(tempItem.totalBalance) > 0) {
       _totalAmount = double.parse(tempItem.totalBalance);
       disFAB = true;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final rateField = Container(
@@ -220,44 +228,45 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
             _count = (_count! - 1);
           });
           (_count! < 0)
-              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Please Wait!!")))
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Please Wait!!")))
               : AddData();
         },
         child: (_process!)
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Center(
-                child: SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.white,
-                      strokeWidth: 2,
-                    ))),
-          ],
-        )
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Close LC',
-          textAlign: TextAlign.center,
-          style:
-          TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Close LC',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
-    Widget buildSingleItem(LC lc) => Container(
+    Widget buildSingleItem(LC lc, Map map) => Container(
           padding: const EdgeInsets.all(15),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -400,6 +409,50 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    width: 70,
+                  ),
+                  disFAB
+                      ? Text("")
+                      : IconButton(
+                          onPressed: () {
+                            map.forEach((key, value) {
+                              if (value.lcNumber == lc.lcNumber &&
+                                  value.invoice == lc.invoice) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            IndividualLCUpdateScreen(
+                                              lcModel: lc,
+                                              k: key,
+                                            )));
+                              }
+                            });
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            color: Colors.red,
+                          ),
+                        ),
+                  disFAB
+                      ? Text("")
+                      : IconButton(
+                          onPressed: () {
+                            map.forEach((key, value) {
+                              if (value.lcNumber == lc.lcNumber &&
+                                  value.invoice == lc.invoice) {
+                                Hive.box('lcs').delete(key);
+                              }
+                            });
+
+                    
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -412,10 +465,12 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
         builder: (context, lcBox, _) {
           final lcBox = Hive.box('lcs')
               .values
-              .where((c) => c.lcNumber
-                  .toLowerCase()
-                  .contains(widget.lcModel.lcNumber.toLowerCase()))
+              .where((c) =>
+                  c.lcNumber.toLowerCase() ==
+                  (widget.lcModel.lcNumber.toLowerCase()))
               .toList();
+
+          final Map lcMap = Hive.box('lcs').toMap();
           return (lcBox == null)
               ? Center(
                   child: CircularProgressIndicator(),
@@ -426,7 +481,7 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
                     )
                   : ListView.builder(
                       itemBuilder: (context, index) {
-                        return buildSingleItem(lcBox[index]);
+                        return buildSingleItem(lcBox[index], lcMap);
                       },
                       itemCount: lcBox.length,
                     );
@@ -434,80 +489,134 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("LC Number ${widget.lcModel.lcNumber}"),
-      ),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "LC Number : ${widget.lcModel.lcNumber}",
-                    style: TextStyle(color: Colors.red, fontSize: 18),
-                  ),
-                  Text(
-                    "Stock : $_totalStock CFT",
-                    style: TextStyle(color: Colors.red, fontSize: 18),
-                  ),
-                  Text(
-                    "Total Balance : $_totalAmount TK",
-                    style: TextStyle(color: Colors.red, fontSize: 18),
-                  ),
-                ],
+    Widget _getFAB() {
+      return SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22),
+        backgroundColor: Colors.blue,
+        visible: true,
+        curve: Curves.bounceIn,
+        children: [
+          // FAB 1
+          SpeedDialChild(
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
-              SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  rateField,
-                  lcOpenPriceField,
-                ],
+              backgroundColor: Colors.blue,
+              onTap: () {
+                disFAB
+                    ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: Colors.green,
+                        content: Text("LC Closed!!")))
+                    : Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => IndividualLCEntryScreen(
+                                lcModel: widget.lcModel)));
+              },
+              label: 'Add Data',
+              labelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontSize: 16.0),
+              labelBackgroundColor: Colors.blue),
+          // FAB 2
+          SpeedDialChild(
+              child: Icon(
+                Icons.picture_as_pdf_outlined,
+                color: Colors.white,
               ),
-              SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  dutyCostField,
-                  speedMoneyField
-                ],
-              ),
-              SizedBox(height: 20,),
-              addButton,
-              SizedBox(height: 20,),
-              Expanded(child: _buildListView()),
+              backgroundColor: Colors.blue,
+              onTap: () {
+                setState(() {
+                  generatePdf();
+                });
+              },
+              label: 'Generated PDF',
+              labelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                  fontSize: 16.0),
+              labelBackgroundColor: Colors.blue)
+        ],
+      );
+    }
 
-            ],
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text("LC Number ${widget.lcModel.lcNumber}"),
+        ),
+        body: Container(
+          padding: EdgeInsets.all(20),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "LC Number : ${widget.lcModel.lcNumber}",
+                      style: TextStyle(color: Colors.red, fontSize: 18),
+                    ),
+                    Text(
+                      "Stock : $_totalStock CFT",
+                      style: TextStyle(color: Colors.red, fontSize: 18),
+                    ),
+                    Text(
+                      "Total Balance : $_totalAmount TK",
+                      style: TextStyle(color: Colors.red, fontSize: 18),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    rateField,
+                    lcOpenPriceField,
+                  ],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [dutyCostField, speedMoneyField],
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                addButton,
+                SizedBox(
+                  height: 20,
+                ),
+                Expanded(child: _buildListView()),
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          disFAB ?  ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("LC Closed!!"))) : Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      IndividualLCEntryScreen(lcModel: widget.lcModel)));
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
-    );
+        floatingActionButton: _getFAB());
   }
+
   void AddData() {
     if (_formKey.currentState!.validate()) {
       final lcBox = Hive.box('lcs');
       final _stock = _totalStock.toString();
-      final _purchaseBalance = (double.parse(_totalStock.toString()) * double.parse(rateEditingController.text)).toString();
-      final _totalBalance = (double.parse(_purchaseBalance) + double.parse(lcOpenPriceEditingController.text) + double.parse(dutyCostEditingController.text) + double.parse(speedMoneyEditingController.text)).toString();
+      final _purchaseBalance = (double.parse(_totalStock.toString()) *
+              double.parse(rateEditingController.text))
+          .toString();
+      final _totalBalance = (double.parse(_purchaseBalance) +
+              double.parse(lcOpenPriceEditingController.text) +
+              double.parse(dutyCostEditingController.text) +
+              double.parse(speedMoneyEditingController.text))
+          .toString();
       final lcModel = LC(
-          "LC Closed",
+          DateFormat('dd-MMM-yyyy').format(DateTime.now()),
           "LC Closed",
           "LC Closed",
           "LC Closed",
@@ -521,48 +630,95 @@ class _IndividualLCHistoryScreenState extends State<IndividualLCHistoryScreen> {
           "LC Closed",
           _purchaseBalance,
           lcOpenPriceEditingController.text,
-    dutyCostEditingController.text,speedMoneyEditingController.text,"LC Closed",
+          dutyCostEditingController.text,
+          speedMoneyEditingController.text,
+          "LC Closed",
           widget.lcModel.lcNumber,
           _totalBalance,
           widget.lcModel.date);
 
       lcBox.add(lcModel);
-      final tempBox = Hive.box('lcs')
-          .values
-          .where((c) => c.lcNumber
+      final tempBox = Hive.box('lcs').values.where((c) => c.lcNumber
           .toLowerCase()
           .contains(widget.lcModel.lcNumber.toLowerCase()));
 
       final tempItem = tempBox.last as LC;
-      if(double.parse(tempItem.totalBalance) > 0){
+      if (double.parse(tempItem.totalBalance) > 0) {
         setState(() {
           _totalAmount = double.parse(tempItem.totalBalance);
           disFAB = true;
+          rate = rateEditingController.text;
+          lcOpenPrice = lcOpenPriceEditingController.text;
+          dutyCost = dutyCostEditingController.text;
+          speedMoney = speedMoneyEditingController.text;
+
           rateEditingController.clear();
           lcOpenPriceEditingController.clear();
           dutyCostEditingController.clear();
           speedMoneyEditingController.clear();
 
-          final companyModel = Company("0", widget.lcModel.sellerName, widget.lcModel.sellerContact, "0", _purchaseBalance , "0","Stone Purchase :" + widget.lcModel.lcNumber, "2", "0", "0", widget.lcModel.date,"0");
+          final companyModel = Company(
+              "stonestock" + widget.lcModel.lcNumber,
+              widget.lcModel.sellerName,
+              widget.lcModel.sellerContact,
+              "0",
+              _purchaseBalance,
+              "0",
+              "stonestock" + widget.lcModel.lcNumber,
+              "2",
+              "0",
+              "0",
+              widget.lcModel.date,
+              "0");
           Hive.box('companies').add(companyModel);
         });
       }
 
       setState(() {
         _process = false;
-
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("LC Closed!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("LC Closed!!")));
       setState(() {
         _process = false;
         _count = 1;
       });
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;
       });
     }
+  }
+
+  void generatePdf() async {
+    final _list = <StonePurchaseItem>[];
+    final lcBox = Hive.box('lcs')
+        .values
+        .where((c) =>
+            c.lcNumber.toLowerCase() == (widget.lcModel.lcNumber.toLowerCase()))
+        .toList();
+    for (int i = 0; i < lcBox.length; i++) {
+      final _temp = lcBox[i] as LC;
+      _list.add(new StonePurchaseItem(_temp.date, _temp.truckCount,
+          _temp.truckNumber, _temp.port, _temp.cft, _temp.remarks));
+    }
+
+    final invoice = InvoiceStonePurchase(
+        widget.lcModel.lcNumber,
+        widget.lcModel.sellerName,
+        widget.lcModel.sellerContact,
+        rate,
+        lcOpenPrice,
+        dutyCost,
+        speedMoney,
+        _list);
+
+    final pdfFile = await PdfInvoiceApiStonePurchase.generate(invoice);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.green, content: Text("Pdf Generated!!")));
   }
 }

@@ -81,7 +81,7 @@ class _CompanyListScreenState extends State<CompanyListScreen> {
             .values
             .where((c) => c.invoice
             .toLowerCase()
-            .contains("1"))
+            ==("1"))
             .toList();
 
         final Map companyMap = Hive.box('companies').toMap();
@@ -148,7 +148,7 @@ class CompanySearch extends SearchDelegate{
       .values
       .where((c) => c.invoice
       .toLowerCase()
-      .contains("1"))
+      ==("1"))
       .toList();
 
   @override
@@ -177,7 +177,7 @@ class CompanySearch extends SearchDelegate{
   Widget buildResults(BuildContext context) {
     List<Company> matchQuery = [];
     for(Company lc in searchTerms){
-      if(lc.name.toLowerCase().contains(query.toLowerCase())){
+      if(lc.name.toLowerCase()==(query.toLowerCase())){
         matchQuery.add(lc);
       }
     }
@@ -202,7 +202,7 @@ class CompanySearch extends SearchDelegate{
   Widget buildSuggestions(BuildContext context) {
     List<Company> matchQuery = [];
     for(Company lc in searchTerms){
-      if(lc.name.toLowerCase().contains(query.toLowerCase())){
+      if(lc.name.toLowerCase()==(query.toLowerCase())){
         matchQuery.add(lc);
       }
     }

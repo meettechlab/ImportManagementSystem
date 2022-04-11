@@ -17,8 +17,7 @@ class CompanyPaymentScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _CompanyPaymentScreenState createState() =>
-      _CompanyPaymentScreenState();
+  _CompanyPaymentScreenState createState() => _CompanyPaymentScreenState();
 }
 
 class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
@@ -43,9 +42,8 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
     super.initState();
     _process = false;
     _count = 1;
-    final tempSaleBox = Hive.box('companies')
-        .values;
-    if(tempSaleBox.isNotEmpty){
+    final tempSaleBox = Hive.box('companies').values;
+    if (tempSaleBox.isNotEmpty) {
       setState(() {
         _invoice = int.parse(tempSaleBox.last.invoice) + 1;
       });
@@ -81,10 +79,7 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
                 20,
                 15,
               ),
-              minWidth: MediaQuery
-                  .of(context)
-                  .size
-                  .width / 6,
+              minWidth: MediaQuery.of(context).size.width / 6,
               onPressed: () {
                 showDatePicker(
                   context: context,
@@ -103,7 +98,7 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
@@ -119,10 +114,9 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
             controller: paymentInformationEditingController,
             keyboardType: TextInputType.name,
             validator: (value) {
-              if(_chosenPayment == ""){
+              if (_chosenPayment == "") {
                 return ("Payment Type required!!");
-              }
-              else if (_chosenPayment == 'Bank') {
+              } else if (_chosenPayment == 'Bank') {
                 if (value!.isEmpty) {
                   return ("Payment Information cannot be empty!!");
                 }
@@ -150,7 +144,6 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
                 borderSide: BorderSide(color: Colors.blue),
               ),
             )));
-
 
     final debitCreditField = Container(
         width: MediaQuery.of(context).size.width / 4,
@@ -189,10 +182,7 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
             )));
 
     final remarksField = Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width / 4,
+        width: MediaQuery.of(context).size.width / 4,
         child: TextFormField(
             maxLines: 3,
             cursorColor: Colors.blue,
@@ -243,44 +233,43 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
           });
           (_count! < 0)
               ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              backgroundColor: Colors.red, content: Text("Please Wait!!")))
+                  backgroundColor: Colors.red, content: Text("Please Wait!!")))
               : AddData();
         },
         child: (_process!)
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Center(
-                child: SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.white,
-                      strokeWidth: 2,
-                    ))),
-          ],
-        )
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Entry',
-          textAlign: TextAlign.center,
-          style:
-          TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Entry',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
-
 
     DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
         value: item,
@@ -321,21 +310,19 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
 
     final checkField = Checkbox(
       activeColor: Colors.transparent,
-      side: BorderSide(
-          color: Colors.blue
-      ),
+      side: BorderSide(color: Colors.blue),
       checkColor: Colors.blue,
       onChanged: (bool? value) {
         setState(() {
           _selection = value!;
-          if(_selection){
+          if (_selection) {
             _selectionString = "Debit";
-          }else{
+          } else {
             _selectionString = "Credit";
           }
         });
       },
-      value:  _selection ,
+      value: _selection,
     );
 
     return Scaffold(
@@ -369,28 +356,28 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [Row(
-                        children: [
-                          checkField,
-                          SizedBox(width: 5,),
-                          Text(
-                            _selectionString,
-                            style: TextStyle(
-                                color: Colors.blue
+                      children: [
+                        Row(
+                          children: [
+                            checkField,
+                            SizedBox(
+                              width: 5,
                             ),
-                          )
-                        ],
-                      ), debitCreditField],
+                            Text(
+                              _selectionString,
+                              style: TextStyle(color: Colors.blue),
+                            )
+                          ],
+                        ),
+                        debitCreditField
+                      ],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        paymentDropdown,
-                        paymentInformationField
-                      ],
+                      children: [paymentDropdown, paymentInformationField],
                     ),
                     SizedBox(
                       height: 20,
@@ -416,12 +403,24 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
   void AddData() {
     if (_formKey.currentState!.validate() && _date != null) {
       final companyBox = Hive.box('companies');
-      if(_selection){
+      if (_selection) {
         _debit = debitCreditEditingController.text;
-      }else{
+      } else {
         _credit = debitCreditEditingController.text;
       }
-      final companyModel = Company("0", widget.companyModel.name, widget.companyModel.contact, widget.companyModel.address, _credit, _debit, remarksEditingController.text, _invoice.toString(), _chosenPayment!, paymentInformationEditingController.text, DateFormat('dd-MMM-yyyy').format(_date!),DateFormat('MMM-yyyy').format(_date!));
+      final companyModel = Company(
+          "check",
+          widget.companyModel.name,
+          widget.companyModel.contact,
+          widget.companyModel.address,
+          _credit,
+          _debit,
+          remarksEditingController.text,
+          _invoice.toString(),
+          _chosenPayment!,
+          paymentInformationEditingController.text,
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          DateFormat('MMM-yyyy').format(_date!));
       companyBox.add(companyModel);
       setState(() {
         _process = false;
@@ -433,8 +432,10 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
         _count = 1;
       });
       Navigator.pushReplacement(
-          context, MaterialPageRoute(
-          builder: (context) => SingleCompanyScreen(companyModel: companyModel)));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SingleCompanyScreen(companyModel: companyModel)));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red, content: Text("Something Wrong!!")));
@@ -444,5 +445,4 @@ class _CompanyPaymentScreenState extends State<CompanyPaymentScreen> {
       });
     }
   }
-
 }

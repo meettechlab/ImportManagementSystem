@@ -15,8 +15,7 @@ class SingleCoalEntryScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _SingleCoalEntryScreenState createState() =>
-      _SingleCoalEntryScreenState();
+  _SingleCoalEntryScreenState createState() => _SingleCoalEntryScreenState();
 }
 
 class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
@@ -40,13 +39,12 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
     super.initState();
     _process = false;
     _count = 1;
-    final tempCoalBox = Hive.box('coals')
-        .values;
-    if(tempCoalBox.isEmpty){
+    final tempCoalBox = Hive.box('coals').values;
+    if (tempCoalBox.isEmpty) {
       setState(() {
         _invoice = 1;
       });
-    }else{
+    } else {
       setState(() {
         _invoice = int.parse(tempCoalBox.last.invoice) + 1;
       });
@@ -55,7 +53,6 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final truckCountField = Container(
         width: MediaQuery.of(context).size.width / 4,
         child: TextFormField(
@@ -172,14 +169,13 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
         ],
       ),
     );
-
 
     final portField = Container(
         width: MediaQuery.of(context).size.width / 4,
@@ -251,7 +247,6 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
                 borderSide: BorderSide(color: Colors.blue),
               ),
             )));
-    
 
     final remarksField = Container(
         width: MediaQuery.of(context).size.width / 4,
@@ -304,44 +299,44 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
             _count = (_count! - 1);
           });
           (_count! < 0)
-              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Please Wait!!")))
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Please Wait!!")))
               : AddData();
         },
         child: (_process!)
             ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            Center(
-                child: SizedBox(
-                    height: 15,
-                    width: 15,
-                    child: CircularProgressIndicator(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
                       color: Colors.white,
-                      strokeWidth: 2,
-                    ))),
-          ],
-        )
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Entry',
-          textAlign: TextAlign.center,
-          style:
-          TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Entry',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
-    
 
     return Scaffold(
       appBar: AppBar(
@@ -369,8 +364,6 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
                         pickDate,
                       ],
                     ),
-                   
-
                     SizedBox(
                       height: 20,
                     ),
@@ -378,13 +371,12 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [tonField, portField],
                     ),
-
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [truckCountField,truckCountField],
+                      children: [truckCountField, truckNumberField],
                     ),
                     SizedBox(
                       height: 20,
@@ -408,24 +400,45 @@ class _SingleCoalEntryScreenState extends State<SingleCoalEntryScreen> {
   }
 
   void AddData() {
-    if (_formKey.currentState!.validate()  && _date != null) {
+    if (_formKey.currentState!.validate() && _date != null) {
       final coalBox = Hive.box('coals');
-      
-      final coalModel = Coal(widget.coalModel.lc, DateFormat('dd-MMM-yyyy').format(_date!), _invoice.toString(), widget.coalModel.supplierName, portEditingController.text, tonEditingController.text, "0", "0", "0", "0", "0", "0", remarksEditingController.text,DateFormat('MMM-yyyy').format(_date!),truckCountEditingController.text,truckNumberEditingController.text,widget.coalModel.contact);
+
+      final coalModel = Coal(
+          widget.coalModel.lc,
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          _invoice.toString(),
+          widget.coalModel.supplierName,
+          portEditingController.text,
+          tonEditingController.text,
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          remarksEditingController.text,
+          DateFormat('MMM-yyyy').format(_date!),
+          truckCountEditingController.text,
+          truckNumberEditingController.text,
+          widget.coalModel.contact);
 
       coalBox.add(coalModel);
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Entry Added!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Entry Added!!")));
       setState(() {
         _process = false;
         _count = 1;
       });
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => SingleCoalLCScreen(coalModel: coalModel)));
+          context,
+          MaterialPageRoute(
+              builder: (context) => SingleCoalLCScreen(coalModel: coalModel)));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

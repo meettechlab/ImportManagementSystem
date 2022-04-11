@@ -4,7 +4,6 @@ part 'cstock.g.dart';
 
 @HiveType(typeId: 2)
 class CStock {
-
   @HiveField(0)
   final String invoice;
 
@@ -59,11 +58,11 @@ class CStock {
   @HiveField(17)
   final String price;
 
-
-
+  @HiveField(18)
+  final String truckNumber;
 
   CStock(
-     this.invoice,
+      this.invoice,
       this.date,
       this.truckCount,
       this.port,
@@ -80,6 +79,6 @@ class CStock {
       this.supplierContact,
       this.year,
       this.rate,
-      this.price
-      );
+      this.price,
+      this.truckNumber);
 }

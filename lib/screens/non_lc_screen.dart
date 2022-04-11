@@ -36,16 +36,53 @@ class _NonLCScreenState extends State<NonLCScreen> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
+    Widget getImageButton(VoidCallback action, String url, String buttonText) =>
+        Material(
+          color: Colors.blue,
+          elevation: 5,
+          borderRadius: BorderRadius.circular(28),
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          child: InkWell(
+            splashColor: Colors.black26,
+            onTap: action,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Ink.image(
+                  image: AssetImage(
+                    url,
+                  ),
+                  height: MediaQuery.of(context).size.height / 5,
+                  width: MediaQuery.of(context).size.width / 5,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    buttonText,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.white),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Daily Cost',
+          'Non-LC',
           textAlign: TextAlign.center,
-          style: TextStyle(
-          ),
+          style: TextStyle(),
         ),
       ),
       body: Container(
@@ -55,50 +92,40 @@ class _NonLCScreenState extends State<NonLCScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20,),
-              Center(
-                child: TextButton(
-                    onPressed: (){
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => NonCoalListScreen()));
-                    },
-                    child: Text(
-                      'NON-LC Coal',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                      ),
-                    )
-                ),
+              SizedBox(
+                height: 50,
               ),
-              SizedBox(height: 20,),
-              Center(
-                child: TextButton(
-                    onPressed: (){
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  getImageButton(
+                    () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => NonStoneListScreen()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NonCoalListScreen()));
                     },
-                    child: Text(
-                      'NON-LC Stone',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                      ),
-                    )
-                ),
+                    'assets/images/Coal.jpg',
+                    'Non-LC Coal',
+                  ),
+                  getImageButton(
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NonStoneListScreen()));
+                    },
+                    'assets/images/stone.jpg',
+                    'Non-LC Stone',
+                  ),
+                ],
               ),
-
+              SizedBox(
+                height: 100,
+              ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DailyEntryScreen()));
-        },
-        child:Icon(Icons.add),
-        backgroundColor: Colors.blue,
       ),
     );
   }

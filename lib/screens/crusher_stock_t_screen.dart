@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
 import 'package:importmanagementsoftware/model/cstock.dart';
 import 'package:importmanagementsoftware/model/lc.dart';
 import 'package:importmanagementsoftware/screens/crusher_stock_entry.dart';
+import 'package:importmanagementsoftware/screens/crusher_stock_update.dart';
 import 'package:importmanagementsoftware/screens/individual_lc_history_screen.dart';
 import 'package:importmanagementsoftware/screens/lc_new_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:importmanagementsoftware/screens/new_stone_sale_screen.dart';
 
+import '../api/pdf_crusher_stock.dart';
 import '../model/csale.dart';
+import '../model/invoiceCrusherStock.dart';
 import '../model/stone.dart';
 import 'individual_lc_entry_screen.dart';
 
@@ -51,6 +55,50 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
 
   }
 
+
+
+  Widget _getFAB() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22),
+      backgroundColor: Colors.blue,
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.add, color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(
+                  builder: (context) => CrusherStockEntryScreen()));
+            },
+            label: 'Add Data',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue),
+        // FAB 2
+        SpeedDialChild(
+            child: Icon(Icons.picture_as_pdf_outlined,color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              setState(() {
+                generatePdf();
+              });
+            },
+            label: 'Generated PDF',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue)
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,14 +138,7 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => CrusherStockEntryScreen()));
-        },
-        child:Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
+      floatingActionButton: _getFAB(),
     );
   }
 
@@ -108,6 +149,7 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
         final cStockBox = Hive.box('cStocks').values.where((c) => c.port
             .toLowerCase()
             .contains("tamabil")).toList();
+        final Map cStockMap = Hive.box('cStocks').toMap();
         return (cStockBox == null)
             ? Center(
           child: CircularProgressIndicator(),
@@ -118,7 +160,7 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
         )
             : ListView.builder(
           itemBuilder: (context, index) {
-            return buildSingleItem(cStockBox[index]);
+            return buildSingleItem(cStockBox[index],cStockMap);
           },
           itemCount: cStockBox.length,
         );
@@ -127,7 +169,7 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
   }
 
 
-  Widget buildSingleItem(CStock cStock) => Container(
+  Widget buildSingleItem(CStock cStock, Map map) => Container(
     padding: const EdgeInsets.all(15),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -180,6 +222,22 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
                 ),
               ],
             ),
+
+              SizedBox(
+                  width: 70,
+                ),
+                Column(
+                  children: [
+                    Text(
+                      "Truck Plate Number",
+                      style: TextStyle(color: Colors.blue, fontSize: 20),
+                    ),
+                    Text(
+                      cStock.truckNumber,
+                      style: TextStyle(color: Colors.grey, fontSize: 20),
+                    ),
+                  ],
+                ),
             SizedBox(
               width: 70,
             ),
@@ -359,9 +417,66 @@ class _CrusherStockTScreenState extends State<CrusherStockTScreen> {
                 ),
               ],
             ),
+            SizedBox(
+                  width: 70,
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.invoice == cStock.invoice) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CrusherStockUpdateScreen(
+                                      cStock: cStock,
+                                      k: key,
+                                    )));
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.red,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.invoice == cStock.invoice) {
+                        Hive.box('cStocks').delete(key);
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                ),
           ],
         ),
       ),
     ),
   );
+
+
+  void generatePdf() async {
+
+    final _list = <CrusherStockItem>[];
+    final cStockBox = Hive.box('cStocks').values.where((c) => c.port
+        .toLowerCase()
+        .contains("tamabil")).toList();
+    for(int i = 0; i<cStockBox.length;i++){
+      final _temp = cStockBox[i] as CStock;
+      _list.add(new CrusherStockItem(_temp.date, _temp.truckCount, _temp.port,_temp.supplierName,_temp.supplierContact, _temp.cft,_temp.rate,_temp.price,_temp.threeToFour,_temp.oneToSix, _temp.half,_temp.fiveToTen, _temp.totalBalance,_temp.extra, _temp.remarks));
+    }
+
+    final invoice = InvoiceCrusherStock(
+        _list
+    );
+
+
+    final pdfFile = await PdfCrusherStock.generate(invoice);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Pdf Generated!!")));
+
+  }
 }

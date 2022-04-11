@@ -34,16 +34,53 @@ class _DailyCostScreenState extends State<DailyCostScreen> {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
+    Widget getImageButton(VoidCallback action, String url, String buttonText) =>
+        Material(
+          color: Colors.blue,
+          elevation: 5,
+          borderRadius: BorderRadius.circular(28),
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          child: InkWell(
+            splashColor: Colors.black26,
+            onTap: action,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Ink.image(
+                  image: AssetImage(
+                    url,
+                  ),
+                  height: MediaQuery.of(context).size.height / 5,
+                  width: MediaQuery.of(context).size.width / 5,
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(
+                  height: 6,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    buttonText,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.white),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text(
           'Daily Cost',
           textAlign: TextAlign.center,
-          style: TextStyle(
-          ),
+          style: TextStyle(),
         ),
       ),
       body: Container(
@@ -53,54 +90,46 @@ class _DailyCostScreenState extends State<DailyCostScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20,),
-              Center(
-                child: TextButton(
-                    onPressed: (){
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => DailyCoalScreen()));
-                    },
-                    child: Text(
-                      'Coal',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                      ),
-                    )
-                ),
+              SizedBox(
+                height: 50,
               ),
-              SizedBox(height: 20,),
-              Center(
-                child: TextButton(
-                    onPressed: (){
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  getImageButton(
+                    () {
                       Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => DailyStoneScreen()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DailyCoalScreen()));
                     },
-                    child: Text(
-                      'Stone',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                      ),
-                    )
-                ),
+                    'assets/images/Coal.jpg',
+                    'Coal',
+                  ),
+                  getImageButton(
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DailyStoneScreen()));
+                    },
+                    'assets/images/stone.jpg',
+                    'Stone',
+                  ),
+                  getImageButton(
+                    () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DailyCrusherScreen()));
+                    },
+                    'assets/images/crusher.jpg',
+                    'Crusher',
+                  ),
+                ],
               ),
-
-              SizedBox(height: 20,),
-              Center(
-                child: TextButton(
-                    onPressed: (){
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => DailyCrusherScreen()));
-                    },
-                    child: Text(
-                      'Crusher',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                      ),
-                    )
-                ),
+              SizedBox(
+                height: 100,
               ),
             ],
           ),
@@ -108,10 +137,10 @@ class _DailyCostScreenState extends State<DailyCostScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DailyEntryScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => DailyEntryScreen()));
         },
-        child:Icon(Icons.add),
+        child: Icon(Icons.add),
         backgroundColor: Colors.blue,
       ),
     );

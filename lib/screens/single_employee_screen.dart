@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:importmanagementsoftware/api/pdf_employee.dart';
 import 'package:importmanagementsoftware/model/employee.dart';
+import 'package:importmanagementsoftware/model/invoiceEmployee.dart';
 import 'package:importmanagementsoftware/model/lc.dart';
 import 'package:importmanagementsoftware/screens/employee_salary_entry.dart';
+import 'package:importmanagementsoftware/screens/employee_salary_update.dart';
 import 'package:importmanagementsoftware/screens/individual_lc_entry_screen.dart';
 
 class SingleEmployeeScreen extends StatefulWidget {
@@ -38,7 +42,7 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
         .values
         .where((c) =>
         c.name
-            .toLowerCase().contains(widget.employeeModel.name.toLowerCase()))
+            .toLowerCase()==(widget.employeeModel.name.toLowerCase()))
         .toList();
     for (var i = 0; i < tempBox.length; i++) {
       final _temp = tempBox[i] as Employee;
@@ -58,9 +62,51 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
     }
   }
 
+
+  Widget _getFAB() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22),
+      backgroundColor: Colors.blue,
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.add, color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EmployeeSalaryEntryScreen(employeeModel: widget.employeeModel)));
+            },
+            label: 'Add Data',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue),
+        // FAB 2
+        SpeedDialChild(
+            child: Icon(Icons.picture_as_pdf_outlined,color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              setState(() {
+                generatePdf();
+              });
+            },
+            label: 'Generated PDF',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue)
+      ],
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    Widget buildSingleItem(Employee employee) =>
+    Widget buildSingleItem(Employee employee, Map map) =>
         Container(
           padding: const EdgeInsets.all(15),
           child: SingleChildScrollView(
@@ -129,6 +175,44 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
                       ),
                     ],
                   ),
+
+
+                   SizedBox(
+                  width: 70,
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.name == employee.name && value.invoice == employee.invoice) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EmployeeSalaryUpdateScreen(
+                                      employeeModel: employee,
+                                      k: key,
+                                    )));
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.red,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.name == employee.name && value.invoice == employee.invoice) {
+                        Hive.box('employees').delete(key);
+                      }
+                    });
+                  
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                ),
                 ],
               ),
             ),
@@ -145,8 +229,10 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
               .where((c) =>
               c.name
                   .toLowerCase()
-                  .contains(widget.employeeModel.name.toLowerCase()))
+                  ==(widget.employeeModel.name.toLowerCase()))
               .toList();
+
+                 final Map employeeMap = Hive.box('employees').toMap();
           return (employeeBox == null)
               ? Center(
             child: CircularProgressIndicator(),
@@ -157,7 +243,7 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
           )
               : ListView.builder(
             itemBuilder: (context, index) {
-              return buildSingleItem(employeeBox[index]);
+              return buildSingleItem(employeeBox[index],employeeMap);
             },
             itemCount: employeeBox.length,
           );
@@ -212,14 +298,42 @@ class _SingleEmployeeScreenState extends State<SingleEmployeeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => EmployeeSalaryEntryScreen(employeeModel: widget.employeeModel)));
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
+      floatingActionButton: _getFAB(),
     );
+  }
+
+
+
+  void generatePdf() async {
+
+    final _list = <EmployeeItem>[];
+    final tempBox = Hive
+        .box('employees')
+        .values
+        .where((c) =>
+        c.name
+            .toLowerCase().contains(widget.employeeModel.name.toLowerCase()))
+        .toList();
+    for(int i = 0; i<tempBox.length;i++){
+      final _temp = tempBox[i] as Employee;
+    _list.add(new EmployeeItem(_temp.date, _temp.salaryAdvanced, _temp.balance, _temp.remarks));
+    }
+
+    final tempEmployee = tempBox[0] as Employee;
+    final invoice = InvoiceEmployee(
+      tempEmployee.name,
+        tempEmployee.post,
+        tempEmployee.salary,
+        _balance.toString(),
+        _due.toString(),
+        _list
+    );
+
+
+    final pdfFile = await PdfEmployee.generate(invoice);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Pdf Generated!!")));
+
   }
 
 }

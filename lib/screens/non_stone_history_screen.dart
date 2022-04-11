@@ -6,6 +6,7 @@ import 'package:importmanagementsoftware/model/lc.dart';
 import 'package:importmanagementsoftware/model/nonstone.dart';
 import 'package:importmanagementsoftware/screens/individual_lc_entry_screen.dart';
 import 'package:importmanagementsoftware/screens/non_stone_entry_screen.dart';
+import 'package:importmanagementsoftware/screens/non_stone_update_screen.dart';
 import 'package:intl/intl.dart';
 
 import '../model/company.dart';
@@ -56,7 +57,7 @@ class _NonStoneHistoryScreenState extends State<NonStoneHistoryScreen> {
   @override
   Widget build(BuildContext context) {
 
-    Widget buildSingleItem(NonStone lc) => Container(
+    Widget buildSingleItem(NonStone lc , Map map) => Container(
       padding: const EdgeInsets.all(15),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -199,6 +200,45 @@ class _NonStoneHistoryScreenState extends State<NonStoneHistoryScreen> {
                   ),
                 ],
               ),
+
+
+               SizedBox(
+                    width: 70,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      map.forEach((key, value) {
+                        if (value.lcNumber == lc.lcNumber &&
+                            value.invoice == lc.invoice) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NonStoneUpdateScreen(
+                                        lcModel: lc,
+                                        k: key,
+                                      )));
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.red,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      map.forEach((key, value) {
+                        if (value.lcNumber == lc.lcNumber &&
+                            value.invoice == lc.invoice) {
+                          Hive.box('nonstone').delete(key);
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
             ],
           ),
         ),
@@ -215,6 +255,7 @@ class _NonStoneHistoryScreenState extends State<NonStoneHistoryScreen> {
               .toLowerCase()
               .contains(widget.lcModel.lcNumber.toLowerCase()))
               .toList();
+               final Map nonStoneMap = Hive.box('nonstone').toMap();
           return (lcBox == null)
               ? Center(
             child: CircularProgressIndicator(),
@@ -225,7 +266,7 @@ class _NonStoneHistoryScreenState extends State<NonStoneHistoryScreen> {
           )
               : ListView.builder(
             itemBuilder: (context, index) {
-              return buildSingleItem(lcBox[index]);
+              return buildSingleItem(lcBox[index],nonStoneMap);
             },
             itemCount: lcBox.length,
           );

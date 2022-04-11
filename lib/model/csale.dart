@@ -49,6 +49,10 @@ class CSale {
   @HiveField(14)
   final String year;
 
+  
+  @HiveField(15)
+  final String truckNumber;
+
   CSale(
       this.invoice,
       this.date,
@@ -64,6 +68,7 @@ class CSale {
       this.port,
       this.buyerName,
       this.buyerContact,
-      this.year
+      this.year,
+      this.truckNumber
       );
 }

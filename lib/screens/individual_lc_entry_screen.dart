@@ -682,8 +682,6 @@ class _IndividualLCEntryScreenState extends State<IndividualLCEntryScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [cftField, portField],
                     ),
-
-
                     SizedBox(
                       height: 20,
                     ),

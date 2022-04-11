@@ -32,13 +32,14 @@ class CSaleAdapter extends TypeAdapter<CSale> {
       fields[12] as String,
       fields[13] as String,
       fields[14] as String,
+      fields[15] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, CSale obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.invoice)
       ..writeByte(1)
@@ -68,7 +69,9 @@ class CSaleAdapter extends TypeAdapter<CSale> {
       ..writeByte(13)
       ..write(obj.buyerContact)
       ..writeByte(14)
-      ..write(obj.year);
+      ..write(obj.year)
+      ..writeByte(15)
+      ..write(obj.truckNumber);
   }
 
   @override

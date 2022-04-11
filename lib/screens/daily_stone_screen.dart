@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:hive/hive.dart';
 import 'package:importmanagementsoftware/model/lc.dart';
 import 'package:importmanagementsoftware/screens/daily_entry_screen.dart';
+import 'package:importmanagementsoftware/screens/daily_update_screen.dart';
 import 'package:importmanagementsoftware/screens/individual_lc_history_screen.dart';
 import 'package:importmanagementsoftware/screens/lc_new_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:importmanagementsoftware/screens/new_stone_sale_screen.dart';
 
+import '../api/pdf_daily.dart';
 import '../model/daily.dart';
+import '../model/invoiceDaily.dart';
 import '../model/stone.dart';
 import 'individual_lc_entry_screen.dart';
 
@@ -41,6 +45,48 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
     }
   }
 
+
+
+  Widget _getFAB() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22),
+      backgroundColor: Colors.blue,
+      visible: true,
+      curve: Curves.bounceIn,
+      children: [
+        // FAB 1
+        SpeedDialChild(
+            child: Icon(Icons.add, color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => DailyEntryScreen()));
+            },
+            label: 'Add Data',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue),
+        // FAB 2
+        SpeedDialChild(
+            child: Icon(Icons.picture_as_pdf_outlined,color: Colors.white,),
+            backgroundColor: Colors.blue,
+            onTap: () {
+              setState(() {
+                generatePdf();
+              });
+            },
+            label: 'Generated PDF',
+            labelStyle: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16.0),
+            labelBackgroundColor: Colors.blue)
+      ],
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,14 +121,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DailyEntryScreen()));
-        },
-        child:Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
+      floatingActionButton: _getFAB(),
     );
   }
 
@@ -96,6 +135,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
             .toLowerCase()
             .contains("stone"))
             .toList();
+            final Map dailyMap = Hive.box('daily').toMap();
         return (dailyBox == null)
             ? Center(
           child: CircularProgressIndicator(),
@@ -106,7 +146,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
         )
             : ListView.builder(
           itemBuilder: (context, index) {
-            return buildSingleItem(dailyBox[index]);
+            return buildSingleItem(dailyBox[index],dailyMap);
           },
           itemCount: dailyBox.length,
         );
@@ -115,7 +155,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
   }
 
 
-  Widget buildSingleItem(Daily daily) => Container(
+  Widget buildSingleItem(Daily daily, Map map) => Container(
     padding: const EdgeInsets.all(15),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -219,7 +259,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
             Column(
               children: [
                 Text(
-                  "Dissel Cost",
+                  "Diesel Cost",
                   style: TextStyle(color: Colors.blue,fontSize: 20),
                 ),
                 Text(
@@ -234,7 +274,7 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
             Column(
               children: [
                 Text(
-                  "Griss Cost",
+                  "Gris Cost",
                   style: TextStyle(color: Colors.blue,fontSize: 20),
                 ),
                 Text(
@@ -303,9 +343,74 @@ class _DailyStoneScreenState extends State<DailyStoneScreen> {
                 ),
               ],
             ),
+
+             SizedBox(
+                  width: 70,
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.invoice == daily.invoice) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DailyUpdateScreen(
+                                      dailyModel: daily,
+                                      k: key,
+                                    )));
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.red,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    map.forEach((key, value) {
+                      if (value.invoice == daily.invoice) {
+                        Hive.box('daily').delete(key);
+                      }
+                    });
+                  },
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                ),
           ],
         ),
       ),
     ),
   );
+
+
+  void generatePdf() async {
+
+    final _list = <DailyItem>[];
+    final dailyBox = Hive.box('daily')
+        .values
+        .where((c) => c.invoice
+        .toLowerCase()
+        .contains("stone"))
+        .toList();
+    for(int i = 0; i<dailyBox.length;i++){
+      final _temp = dailyBox[i] as Daily;
+      _list.add(new DailyItem(_temp.date,_temp.transport, _temp.unload, _temp.depoRent, _temp.koipot, _temp.stoneCrafting, _temp.disselCost, _temp.grissCost, _temp.mobilCost, _temp.extra, _temp.totalBalance, _temp.remarks));
+    }
+
+    final tempDaily = dailyBox[0] as Daily;
+    final invoice = InvoiceDaily(
+        _totalCost.toString(),
+        tempDaily.invoice,
+        _list
+    );
+
+
+    final pdfFile = await PdfDaily.generate(invoice);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Pdf Generated!!")));
+
+  }
 }

@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,17 +5,17 @@ import 'package:importmanagementsoftware/screens/dashboard.dart';
 import 'package:importmanagementsoftware/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-
-  const SplashScreen({Key? key,}) : super(key: key);
+  const SplashScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   Timer? _timer;
-  int _countdown = 5;
+  int _countdown = 2;
 
   @override
   void initState() {
@@ -25,12 +23,13 @@ class _SplashScreenState extends State<SplashScreen> {
     _startTimer();
   }
 
-  void _startTimer() async{
+  void _startTimer() async {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if(_countdown == 0){
+      if (_countdown == 0) {
         _timer!.cancel();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-      }else{
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      } else {
         setState(() {
           _countdown = _countdown - 1;
         });
@@ -47,21 +46,20 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Container(
             child: Column(
               children: [
-                SizedBox(height: 60,),
                 Center(
                   child: Image.asset(
                     'assets/images/logo.png',
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width/2,
-                    height: MediaQuery.of(context).size.height/2,
+                    fit: BoxFit.contain,
+                    width: MediaQuery.of(context).size.width / 2,
+                    height: MediaQuery.of(context).size.height / 2,
                   ),
                 ),
-                SizedBox(height: 150,),
+                SizedBox(
+                  height: 170,
+                ),
                 Text(
                   'developed by',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Center(
                   child: Column(
@@ -69,42 +67,40 @@ class _SplashScreenState extends State<SplashScreen> {
                       Image.asset(
                         'assets/images/company.png',
                         fit: BoxFit.fitHeight,
-                        width: MediaQuery.of(context).size.width/7,
-                        height: MediaQuery.of(context).size.height/7,
+                        width: MediaQuery.of(context).size.width / 7,
+                        height: MediaQuery.of(context).size.height / 7,
                       ),
                       Text(
                         'MEET TECH LAB',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                          color: Colors.pinkAccent
-                        ),
+                            color: Colors.pinkAccent),
                       ),
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Contact :',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent
-                              ),
-                            ),
-                            Text(
-                              'meettechlab@gmail.com | ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.purpleAccent
-                              ),
-                            ),
-                            Text(
-                              '+8801755460159',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent
-                              ),
-                            ),
-                          ],
+                        children: [
+                          Text(
+                            'Contact :',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent),
+                          ),
+                          Text(
+                            'meettechlab@gmail.com | ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.purpleAccent),
+                          ),
+                          Text(
+                            '+8801755460159',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -27,6 +27,7 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
   final remarksEditingController = new TextEditingController();
   final truckCountEditingController = new TextEditingController();
   final truckNumberEditingController = new TextEditingController();
+
   DateTime? _date;
   final _paymentTypes = ['Cash', 'Bank'];
   String? _chosenPayment;
@@ -39,7 +40,6 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
   List<String> _companyContactList = [];
   String? _chosenCompanyContact;
 
-
   @override
   void initState() {
     super.initState();
@@ -48,33 +48,27 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
 
     final tempSaleBox = Hive.box('coals')
         .values
-        .where((c) => c.lc
-        .toLowerCase()
-        .contains("sale"))
+        .where((c) => c.lc.toLowerCase() == ("sale"))
         .toList();
-    if(tempSaleBox.isEmpty){
+    if (tempSaleBox.isEmpty) {
       setState(() {
-        _invoice = 1;
+        _invoice = 2;
       });
-    }else{
+    } else {
       setState(() {
         _invoice = int.parse(tempSaleBox.last.invoice) + 1;
       });
     }
 
-
     final _tempCompanyList = Hive.box('companies')
         .values
-        .where((c) => c.invoice
-        .toLowerCase()
-        .contains("1"))
+        .where((c) => c.invoice.toLowerCase() == ("1"))
         .toList();
-    for(int i = 0; i< _tempCompanyList.length; i++){
+    for (int i = 0; i < _tempCompanyList.length; i++) {
       final _tempCompany = _tempCompanyList[i] as Company;
       _companyNameList.add(_tempCompany.name);
       _companyContactList.add(_tempCompany.contact);
     }
-
   }
 
   @override
@@ -125,14 +119,13 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
         ],
       ),
     );
-
 
     final portField = Container(
         width: MediaQuery.of(context).size.width / 4,
@@ -319,10 +312,9 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
             controller: paymentInformationEditingController,
             keyboardType: TextInputType.name,
             validator: (value) {
-              if(_chosenPayment == ""){
+              if (_chosenPayment == "") {
                 return ("Payment Type required!!");
-              }
-              else if (_chosenPayment == 'Bank') {
+              } else if (_chosenPayment == 'Bank') {
                 if (value!.isEmpty) {
                   return ("Payment Information cannot be empty!!");
                 }
@@ -385,8 +377,8 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
             )));
 
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
@@ -401,28 +393,43 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Entry',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Entry',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
 
@@ -463,7 +470,6 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
               });
             }));
 
-
     DropdownMenuItem<String> buildMenuContact(String item) => DropdownMenuItem(
         value: item,
         child: Text(
@@ -499,16 +505,13 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
               setState(() {
                 _chosenCompanyContact = newValue;
 
-
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase() == ("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.contact.contains(newValue!)){
+                  if (_tempCompany.contact == (newValue!)) {
                     _chosenCompanyName = _tempCompany.name;
                   }
                 }
@@ -552,13 +555,11 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
 
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase() == ("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.name.contains(newValue!)){
+                  if (_tempCompany.name == (newValue!)) {
                     _chosenCompanyContact = _tempCompany.contact;
                   }
                 }
@@ -593,20 +594,14 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        truckCountField,
-                        truckNumberField
-                      ],
+                      children: [truckCountField, truckNumberField],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        nameDropdown,
-                        contactDropdown
-                      ],
+                      children: [nameDropdown, contactDropdown],
                     ),
                     SizedBox(
                       height: 20,
@@ -644,27 +639,61 @@ class _CoalSaleEntryScreenState extends State<CoalSaleEntryScreen> {
   }
 
   void AddData() {
-    if (_formKey.currentState!.validate() && _chosenPayment != null && _chosenCompanyContact != null && _chosenCompanyName != null) {
+    if (_formKey.currentState!.validate() &&
+        _chosenPayment != null &&
+        _chosenCompanyContact != null &&
+        _chosenCompanyName != null) {
       final coalBox = Hive.box('coals');
-      final _totalSale = (double.parse(tonEditingController.text) * double.parse(rateEditingController.text)).toString();
+      final _totalSale = (double.parse(tonEditingController.text) *
+              double.parse(rateEditingController.text))
+          .toString();
 
-
-      final coalModel = Coal("sale", DateFormat('dd-MMM-yyyy').format(_date!), _invoice.toString(), _chosenCompanyName!, portEditingController.text, tonEditingController.text, rateEditingController.text, _totalSale, _chosenPayment!, paymentInformationEditingController.text, "0", _totalSale, remarksEditingController.text,DateFormat('MMM-yyyy').format(_date!),truckCountEditingController.text,truckNumberEditingController.text,_chosenCompanyContact!);
+      final coalModel = Coal(
+          "sale",
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          _invoice.toString(),
+          _chosenCompanyName!,
+          portEditingController.text,
+          tonEditingController.text,
+          rateEditingController.text,
+          _totalSale,
+          _chosenPayment!,
+          paymentInformationEditingController.text,
+          "0",
+          _totalSale,
+          remarksEditingController.text,
+          DateFormat('MMM-yyyy').format(_date!),
+          truckCountEditingController.text,
+          truckNumberEditingController.text,
+          _chosenCompanyContact!);
 
       coalBox.add(coalModel);
 
-
-      final companyModel = Company("0", _chosenCompanyName!, _chosenCompanyContact!, "0" , _totalSale ,"Stone Sale ", "2", "0", "0", DateFormat('dd-MMM-yyyy').format(_date!), "Coal Sale",DateFormat('MMM-yyyy').format(_date!));
+      final companyModel = Company(
+          "coalsale" + _invoice.toString(),
+          _chosenCompanyName!,
+          _chosenCompanyContact!,
+          "0",
+          "0",
+          _totalSale,
+          "Coal Sale ",
+          "2",
+          "0",
+          "0",
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          DateFormat('MMM-yyyy').format(_date!));
       Hive.box('companies').add(companyModel);
 
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Entry Added!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Entry Added!!")));
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => CoalSaleScreen()));
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

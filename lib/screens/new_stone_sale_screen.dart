@@ -39,38 +39,32 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
   List<String> _companyContactList = [];
   String? _chosenCompanyContact;
 
-
   @override
   void initState() {
     super.initState();
     _process = false;
     _count = 1;
 
-    final tempSaleBox = Hive.box('stones')
-        .values;
-    if(tempSaleBox.isEmpty){
+    final tempSaleBox = Hive.box('stones').values;
+    if (tempSaleBox.isEmpty) {
       setState(() {
         _invoice = 1;
       });
-    }else{
+    } else {
       setState(() {
         _invoice = int.parse(tempSaleBox.last.invoice) + 1;
       });
     }
 
-
     final _tempCompanyList = Hive.box('companies')
         .values
-        .where((c) => c.invoice
-        .toLowerCase()
-        .contains("1"))
+        .where((c) => c.invoice.toLowerCase().contains("1"))
         .toList();
-    for(int i = 0; i< _tempCompanyList.length; i++){
+    for (int i = 0; i < _tempCompanyList.length; i++) {
       final _tempCompany = _tempCompanyList[i] as Company;
       _companyNameList.add(_tempCompany.name);
       _companyContactList.add(_tempCompany.contact);
     }
-
   }
 
   @override
@@ -121,7 +115,7 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
@@ -385,10 +379,9 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
             controller: paymentInformationEditingController,
             keyboardType: TextInputType.name,
             validator: (value) {
-              if(_chosenPayment == ""){
+              if (_chosenPayment == "") {
                 return ("Payment Type required!!");
-              }
-              else if (_chosenPayment == 'Bank') {
+              } else if (_chosenPayment == 'Bank') {
                 if (value!.isEmpty) {
                   return ("Payment Information cannot be empty!!");
                 }
@@ -451,8 +444,8 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
             )));
 
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
@@ -467,28 +460,43 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Entry',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Entry',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
 
@@ -529,7 +537,6 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
               });
             }));
 
-
     DropdownMenuItem<String> buildMenuContact(String item) => DropdownMenuItem(
         value: item,
         child: Text(
@@ -565,16 +572,13 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
               setState(() {
                 _chosenCompanyContact = newValue;
 
-
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.contact.contains(newValue!)){
+                  if (_tempCompany.contact.contains(newValue!)) {
                     _chosenCompanyName = _tempCompany.name;
                   }
                 }
@@ -618,13 +622,11 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
 
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.name.contains(newValue!)){
+                  if (_tempCompany.name.contains(newValue!)) {
                     _chosenCompanyContact = _tempCompany.contact;
                   }
                 }
@@ -669,10 +671,7 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                       nameDropdown,
-                        contactDropdown
-                      ],
+                      children: [nameDropdown, contactDropdown],
                     ),
                     SizedBox(
                       height: 20,
@@ -710,26 +709,61 @@ class _NewStoneSaleScreenState extends State<NewStoneSaleScreen> {
   }
 
   void AddData() {
-    if (_formKey.currentState!.validate() && _chosenPayment != null && _chosenCompanyContact != null && _chosenCompanyName != null) {
+    if (_formKey.currentState!.validate() &&
+        _chosenPayment != null &&
+        _chosenCompanyContact != null &&
+        _chosenCompanyName != null &&
+        _date != null) {
       final stoneBox = Hive.box('stones');
       final _stock = cftEditingController.text;
-      final _totalSale = (double.parse(cftEditingController.text) * double.parse(rateEditingController.text)).toString();
-      final stoneModel = Stone(DateFormat('dd-MMM-yyyy').format(_date!), truckCountEditingController.text, truckNumberEditingController.text, _invoice.toString(), portEditingController.text, cftEditingController.text, rateEditingController.text, _chosenPayment!, paymentInformationEditingController.text, remarksEditingController.text, _chosenCompanyName!,_chosenCompanyContact!, _totalSale, _stock,DateFormat('MMM-yyyy').format(_date!));
-
+      final _totalSale = (double.parse(cftEditingController.text) *
+              double.parse(rateEditingController.text))
+          .toString();
+      final stoneModel = Stone(
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          truckCountEditingController.text,
+          truckNumberEditingController.text,
+          _invoice.toString(),
+          portEditingController.text,
+          cftEditingController.text,
+          rateEditingController.text,
+          _chosenPayment!,
+          paymentInformationEditingController.text,
+          remarksEditingController.text,
+          _chosenCompanyName!,
+          _chosenCompanyContact!,
+          _totalSale,
+          _stock,
+          DateFormat('MMM-yyyy').format(_date!));
+          
       stoneBox.add(stoneModel);
 
+      final companyModel = Company(
+          "stonesale" + _invoice.toString(),
+          _chosenCompanyName!,
+          _chosenCompanyContact!,
+          "0",
+          "0",
+          _totalSale,
+          "Stone Sale ",
+          "2",
+          "0",
+          "0",
+          DateFormat('dd-MMM-yyyy').format(_date!),
+          DateFormat('MMM-yyyy').format(_date!));
 
-      final companyModel = Company("0", _chosenCompanyName!, _chosenCompanyContact!, "0", "0" , _totalSale ,"Stone Sale ", "2", "0", "0", DateFormat('dd-MMM-yyyy').format(_date!),DateFormat('MMM-yyyy').format(_date!));
       Hive.box('companies').add(companyModel);
 
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Entry Added!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Entry Added!!")));
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => StoneSaleScreen()));
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

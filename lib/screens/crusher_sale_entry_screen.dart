@@ -28,13 +28,13 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
   final halfEditingController = new TextEditingController();
   final fiveToTenEditingController = new TextEditingController();
   final remarksEditingController = new TextEditingController();
+  final truckNumberEditingController = new TextEditingController();
   DateTime? _date;
   bool? _process;
   int? _count;
   int? _invoice;
   final _portTypes = ['Shutarkandi', 'Tamabil'];
   String? _chosenPort;
-
 
   List<String> _companyNameList = [];
   String? _chosenCompanyName;
@@ -46,26 +46,22 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
     super.initState();
     _process = false;
     _count = 1;
-    final tempSaleBox = Hive.box('cSales')
-        .values;
-    if(tempSaleBox.isEmpty){
+    final tempSaleBox = Hive.box('cSales').values;
+    if (tempSaleBox.isEmpty) {
       setState(() {
         _invoice = 1;
       });
-    }else{
+    } else {
       setState(() {
         _invoice = int.parse(tempSaleBox.last.invoice) + 1;
       });
     }
 
-
     final _tempCompanyList = Hive.box('companies')
         .values
-        .where((c) => c.invoice
-        .toLowerCase()
-        .contains("1"))
+        .where((c) => c.invoice.toLowerCase().contains("1"))
         .toList();
-    for(int i = 0; i< _tempCompanyList.length; i++){
+    for (int i = 0; i < _tempCompanyList.length; i++) {
       final _tempCompany = _tempCompanyList[i] as Company;
       _companyNameList.add(_tempCompany.name);
       _companyContactList.add(_tempCompany.contact);
@@ -120,13 +116,48 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
         ],
       ),
     );
+
+    final truckNumberField = Container(
+        width: MediaQuery.of(context).size.width / 4,
+        child: TextFormField(
+            cursorColor: Colors.blue,
+            autofocus: false,
+            controller: truckNumberEditingController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("Truck Plate Number cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              truckNumberEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Truck Plate Number',
+              labelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            )));
 
     final truckCountField = Container(
         width: MediaQuery.of(context).size.width / 4,
@@ -411,8 +442,8 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
             )));
 
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
@@ -427,28 +458,43 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Stock',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Stock',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
 
@@ -489,7 +535,6 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
               });
             }));
 
-
     DropdownMenuItem<String> buildMenuName(String item) => DropdownMenuItem(
         value: item,
         child: Text(
@@ -527,19 +572,16 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
 
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.name.contains(newValue!)){
+                  if (_tempCompany.name.contains(newValue!)) {
                     _chosenCompanyContact = _tempCompany.contact;
                   }
                 }
               });
             }));
-
 
     DropdownMenuItem<String> buildMenuContact(String item) => DropdownMenuItem(
         value: item,
@@ -576,16 +618,13 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
               setState(() {
                 _chosenCompanyContact = newValue;
 
-
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.contact.contains(newValue!)){
+                  if (_tempCompany.contact.contains(newValue!)) {
                     _chosenCompanyName = _tempCompany.name;
                   }
                 }
@@ -608,11 +647,18 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+                    SizedBox(
+                      height: 20,
+                    ),
+                    pickDate,
+                    SizedBox(
+                      height: 20,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         truckCountField,
-                        pickDate,
+                        truckNumberField,
                       ],
                     ),
                     SizedBox(
@@ -620,42 +666,28 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        cftField,
-                        rateField
-
-                      ],
+                      children: [cftField, rateField],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        threeToFourField,
-                        oneToSixField
-
-                      ],
+                      children: [threeToFourField, oneToSixField],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        halfField,
-                        fiveToTenField
-                      ],
+                      children: [halfField, fiveToTenField],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        nameDropdown,
-                        contactDropdown
-                      ],
+                      children: [nameDropdown, contactDropdown],
                     ),
                     SizedBox(
                       height: 20,
@@ -683,29 +715,95 @@ class _CrusherSaleEntryScreenState extends State<CrusherSaleEntryScreen> {
   }
 
   void AddData() {
-    if (_formKey.currentState!.validate() &&  _date != null ) {
+    if (_formKey.currentState!.validate() && _date != null) {
       final cSaleBox = Hive.box('cSales');
-      final _price = (double.parse(cftEditingController.text) * double.parse(rateEditingController.text)).toString();
+      final _price = (double.parse(cftEditingController.text) *
+              double.parse(rateEditingController.text))
+          .toString();
 
-        final cSaleModel = CSale(_invoice.toString(), DateFormat('dd-MMM-yyyy').format(_date!),truckCountEditingController.text,cftEditingController.text,rateEditingController.text,_price,threeToFourEditingController.text,oneToSixEditingController.text,halfEditingController.text,fiveToTenEditingController.text,remarksEditingController.text,_chosenPort!, _chosenCompanyName!, _chosenCompanyContact!,DateFormat('MMM-yyyy').format(_date!));
+      if (_chosenPort == "Shutarkandi") {
+        final cSaleModel = CSale(
+            _invoice.toString(),
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            truckCountEditingController.text,
+            cftEditingController.text,
+            rateEditingController.text,
+            _price,
+            threeToFourEditingController.text,
+            oneToSixEditingController.text,
+            halfEditingController.text,
+            fiveToTenEditingController.text,
+            remarksEditingController.text,
+            _chosenPort!,
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            DateFormat('MMM-yyyy').format(_date!),
+            truckNumberEditingController.text);
         cSaleBox.add(cSaleModel);
-      final companyModel = Company("0", _chosenCompanyName!, _chosenCompanyContact!, "0", "0" , _price,"Crusher Sale", "2", "0", "0",  DateFormat('dd-MMM-yyyy').format(_date!),DateFormat('MMM-yyyy').format(_date!));
-      Hive.box('companies').add(companyModel);
+        final companyModel = Company(
+            "crushersaleshutarkandi" + _invoice.toString(),
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            "0",
+            "0",
+            _price,
+            "Crusher Sale Shutarkandi",
+            "2",
+            "0",
+            "0",
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            DateFormat('MMM-yyyy').format(_date!));
+        Hive.box('companies').add(companyModel);
+      } else {
+        final cSaleModel = CSale(
+            _invoice.toString(),
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            truckCountEditingController.text,
+            cftEditingController.text,
+            rateEditingController.text,
+            _price,
+            threeToFourEditingController.text,
+            oneToSixEditingController.text,
+            halfEditingController.text,
+            fiveToTenEditingController.text,
+            remarksEditingController.text,
+            _chosenPort!,
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            DateFormat('MMM-yyyy').format(_date!),
+            truckNumberEditingController.text);
+        cSaleBox.add(cSaleModel);
+        final companyModel = Company(
+            "crushersaletamabil" + _invoice.toString(),
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            "0",
+            "0",
+            _price,
+            "Crusher Sale Tamabil",
+            "2",
+            "0",
+            "0",
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            DateFormat('MMM-yyyy').format(_date!));
+        Hive.box('companies').add(companyModel);
+      }
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Entry Added!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Entry Added!!")));
 
-
-      if(_chosenPort == "Shutarkandi"){
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => CrusherSaleSScreen()));
-      }else{
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => CrusherSaleTScreen()));
+      if (_chosenPort == "Shutarkandi") {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => CrusherSaleSScreen()));
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => CrusherSaleTScreen()));
       }
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

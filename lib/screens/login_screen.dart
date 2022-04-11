@@ -1,13 +1,12 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:importmanagementsoftware/screens/dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
-
-  const LoginScreen({Key? key,}) : super(key: key);
+  const LoginScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -100,49 +99,62 @@ class _LoginScreenState extends State<LoginScreen> {
             )));
 
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
           150,
-          35,
+          25,
           150,
-          35,
+          25,
         ),
-        minWidth: 20,
+        minWidth: MediaQuery.of(context).size.width / 4,
         onPressed: () {
           setState(() {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Login',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Login',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
     return Scaffold(
-
-
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -151,46 +163,48 @@ class _LoginScreenState extends State<LoginScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  SizedBox(height: 10,),
                   Center(
                     child: Image.asset(
                       'assets/images/logo.png',
-                      fit: BoxFit.fitHeight,
-                      width: MediaQuery.of(context).size.width/2,
-                      height: MediaQuery.of(context).size.height/2,
+                      fit: BoxFit.contain,
+                      width: MediaQuery.of(context).size.width / 2,
+                      height: MediaQuery.of(context).size.height / 2,
                     ),
                   ),
-                  SizedBox(height: 10,),
                   userField,
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   passwordField,
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 20,
+                  ),
                   addButton,
-                  SizedBox(height: 20,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Center(
                     child: Column(
                       children: [
                         Text(
                           'developed by',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Image.asset(
                           'assets/images/company.png',
                           fit: BoxFit.fitHeight,
-                          width: MediaQuery.of(context).size.width/7,
-                          height: MediaQuery.of(context).size.height/7,
+                          width: MediaQuery.of(context).size.width / 7,
+                          height: MediaQuery.of(context).size.height / 7,
                         ),
-
                         Text(
                           'MEET TECH LAB',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.pinkAccent
-                          ),
+                              color: Colors.pinkAccent),
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(
+                          height: 10,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -198,22 +212,19 @@ class _LoginScreenState extends State<LoginScreen> {
                               'Contact :',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent
-                              ),
+                                  color: Colors.blueAccent),
                             ),
                             Text(
                               'meettechlab@gmail.com | ',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.purpleAccent
-                              ),
+                                  color: Colors.purpleAccent),
                             ),
                             Text(
                               '+8801755460159',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.blueAccent
-                              ),
+                                  color: Colors.blueAccent),
                             ),
                           ],
                         ),
@@ -229,28 +240,35 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void AddData(){
-    if(_formKey.currentState!.validate()){
-      if(userEditingController.text == "admin" && passwordEditingController.text == "admin"){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Login Successful!!")));
+  void AddData() {
+    if (_formKey.currentState!.validate()) {
+      if (userEditingController.text == "admin" &&
+          passwordEditingController.text == "admin") {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Dashboard()));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Login Successful!!")));
         setState(() {
           _process = false;
           _count = 1;
         });
-      }else{
+      } else {
         setState(() {
           _process = false;
           _count = 1;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Username or Password missmatch!!")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Username or Password missmatch!!")));
       }
-    }else{
+    } else {
       setState(() {
         _process = false;
         _count = 1;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
     }
   }
 }

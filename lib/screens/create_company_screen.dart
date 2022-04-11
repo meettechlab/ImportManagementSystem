@@ -25,19 +25,15 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen> {
   bool? _process;
   int? _count;
 
-
-
   @override
   void initState() {
     super.initState();
     _process = false;
     _count = 1;
-
   }
 
   @override
   Widget build(BuildContext context) {
-
     final nameField = Container(
         width: MediaQuery.of(context).size.width / 4,
         child: TextFormField(
@@ -143,10 +139,9 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen> {
               ),
             )));
 
-
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
@@ -161,28 +156,43 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen> {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Client/Supplier',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Client/Supplier',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
 
@@ -204,19 +214,14 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen> {
                   children: <Widget>[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        nameField,
-                        contactField
-                      ],
+                      children: [nameField, contactField],
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        addressField
-                      ],
+                      children: [addressField],
                     ),
                     SizedBox(
                       height: 20,
@@ -240,16 +245,34 @@ class _CreateCompanyScreenState extends State<CreateCompanyScreen> {
       final companyBox = Hive.box('companies');
       final _invoice = "1";
       final _id = nameEditingController.text.split(" ").first + "1";
-      final companyModel = Company(_id, nameEditingController.text, contactEditingController.text, addressEditingController.text, "0", "0", "Created", _invoice, "0", "0", "0","0");
+      final companyModel = Company(
+          _id,
+          nameEditingController.text,
+          contactEditingController.text,
+          addressEditingController.text,
+          "0",
+          "0",
+          "Created",
+          _invoice,
+          "0",
+          "0",
+          DateFormat('dd-MMM-yyyy').format(DateTime.now()),
+          "0");
       companyBox.add(companyModel);
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Client/Supplier Created!!")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Client/Supplier Created!!")));
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => SingleCompanyScreen(companyModel: companyModel)));
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  SingleCompanyScreen(companyModel: companyModel)));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

@@ -27,7 +27,6 @@ class _NonStoneListScreenState extends State<NonStoneListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
 
   @override
@@ -35,23 +34,18 @@ class _NonStoneListScreenState extends State<NonStoneListScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-            'Non-LC Stone List'
-        ),
+        title: Text('Non-LC Stone List'),
       ),
-
-
       body: Padding(
         padding: const EdgeInsets.all(18.0),
-        child:  _buildListView(),
+        child: _buildListView(),
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NonStoneCreateScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => NonStoneCreateScreen()));
         },
-        child:Icon(Icons.add),
+        child: Icon(Icons.add),
         backgroundColor: Colors.blue,
       ),
     );
@@ -63,121 +57,150 @@ class _NonStoneListScreenState extends State<NonStoneListScreen> {
       builder: (context, lcBox, _) {
         final lcBox = Hive.box('nonstone')
             .values
-            .where((c) => c.invoice
-            .toLowerCase()
-            .contains("1"))
+            .where((c) => c.invoice.toLowerCase().contains("1"))
             .toList();
         final Map nonStoneMap = Hive.box('nonstone').toMap();
         return (lcBox == null)
             ? Center(
-          child: CircularProgressIndicator(),
-        )
+                child: CircularProgressIndicator(),
+              )
             : (lcBox.isEmpty)
-            ? Center(
-          child: Text('No Non-LC'),
-        )
-            : ListView.builder(
-          itemBuilder: (context, index) {
-            return buildSingleItem(lcBox[index], nonStoneMap);
-          },
-          itemCount: lcBox.length,
-        );
+                ? Center(
+                    child: Text('No Non-LC'),
+                  )
+                : ListView.builder(
+                    itemBuilder: (context, index) {
+                      return buildSingleItem(lcBox[index], nonStoneMap);
+                    },
+                    itemCount: lcBox.length,
+                  );
       },
     );
   }
 
-
   Widget buildSingleItem(NonStone lc, Map map) => InkWell(
-    onTap: (){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => NonStoneHistoryScreen(lcModel: lc)));
-    },
-    child: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(width: 20,),
-            Text(
-              lc.lcNumber,
-              style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold
-              ),
-            ),
-
-            IconButton(
-              onPressed: (){
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) => new AlertDialog(
-                      title: new Text('Enter the LC number to Save'),
-                      content:new Form(
-                        key: _formKey,
-                        child: Container(
-                            width: MediaQuery.of(context).size.width / 4,
-                            child: TextFormField(
-                                cursorColor: Colors.blue,
-                                autofocus: false,
-                                controller: lcNumberEditingController,
-                                keyboardType: TextInputType.name,
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return ("LC Number cannot be empty!!");
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  lcNumberEditingController.text = value!;
-                                },
-                                textInputAction: TextInputAction.next,
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                    20,
-                                    15,
-                                    20,
-                                    15,
-                                  ),
-                                  labelText: 'LC Number',
-                                  labelStyle: TextStyle(color: Colors.blue),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(color: Colors.blue),
-                                  ),
-                                ))),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => NonStoneHistoryScreen(lcModel: lc)));
+        },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                  lc.lcNumber,
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        map.forEach((key, value) {
+                          if (value.lcNumber == lc.lcNumber) {
+                            Hive.box('nonstone').delete(key);
+                          }
+                        });
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.red,
                       ),
-                      actions: <Widget>[
-                        new IconButton(
-                            icon: new Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            }),
-                        new IconButton(
-                            icon: new Icon(Icons.save),
-                            onPressed: () {
-                              AddData(lc,map);
-                            })
-                      ],
-                    ));
-              },
-              icon: Icon(Icons.save, color: Colors.red, size: 20,),
-            )
-          ],
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) => new AlertDialog(
+                                  title:
+                                      new Text('Enter the LC number to Save'),
+                                  content: new Form(
+                                    key: _formKey,
+                                    child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                4,
+                                        child: TextFormField(
+                                            cursorColor: Colors.blue,
+                                            autofocus: false,
+                                            controller:
+                                                lcNumberEditingController,
+                                            keyboardType: TextInputType.name,
+                                            validator: (value) {
+                                              if (value!.isEmpty) {
+                                                return ("LC Number cannot be empty!!");
+                                              }
+                                              return null;
+                                            },
+                                            onSaved: (value) {
+                                              lcNumberEditingController.text =
+                                                  value!;
+                                            },
+                                            textInputAction:
+                                                TextInputAction.next,
+                                            decoration: InputDecoration(
+                                              contentPadding:
+                                                  EdgeInsets.fromLTRB(
+                                                20,
+                                                15,
+                                                20,
+                                                15,
+                                              ),
+                                              labelText: 'LC Number',
+                                              labelStyle:
+                                                  TextStyle(color: Colors.blue),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                borderSide: BorderSide(
+                                                    color: Colors.blue),
+                                              ),
+                                            ))),
+                                  ),
+                                  actions: <Widget>[
+                                    new IconButton(
+                                        icon: new Icon(Icons.close),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        }),
+                                    new IconButton(
+                                        icon: new Icon(Icons.save),
+                                        onPressed: () {
+                                          AddData(lc, map);
+                                        })
+                                  ],
+                                ));
+                      },
+                      icon: Icon(
+                        Icons.save,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
-  void AddData(NonStone nonStone, Map map){
-    if(_formKey.currentState!.validate()) {
-      final _tempBox = Hive
-          .box('nonstone')
-          .values
-          .toList();
+  void AddData(NonStone nonStone, Map map) {
+    if (_formKey.currentState!.validate()) {
+      final _tempBox = Hive.box('nonstone').values.toList();
       for (int i = 0; i < _tempBox.length; i++) {
         final _temp = _tempBox[i] as NonStone;
         if (_temp.lcNumber == nonStone.lcNumber) {
@@ -212,10 +235,11 @@ class _NonStoneListScreenState extends State<NonStoneListScreen> {
         }
       });
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("LC moved!!")));
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(backgroundColor: Colors.green, content: Text("LC moved!!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
     }
   }
 }
-

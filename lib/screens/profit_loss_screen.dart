@@ -627,7 +627,6 @@ class _ProfitLossScreenState extends State<ProfitLossScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("No Data Found!!")));
               }
             }
-
             if(_amount < 0){
               setState(() {
                 _loss = _amount;

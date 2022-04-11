@@ -14,7 +14,8 @@ class CrusherStockEntryScreen extends StatefulWidget {
   const CrusherStockEntryScreen({Key? key}) : super(key: key);
 
   @override
-  _CrusherStockEntryScreenState createState() => _CrusherStockEntryScreenState();
+  _CrusherStockEntryScreenState createState() =>
+      _CrusherStockEntryScreenState();
 }
 
 class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
@@ -23,6 +24,7 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
   final tonEditingController = new TextEditingController();
   final remarksEditingController = new TextEditingController();
   final rateEditingController = new TextEditingController();
+   final truckNumberEditingController = new TextEditingController();
   DateTime? _date;
   bool? _process;
   int? _count;
@@ -40,25 +42,12 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
     super.initState();
     _process = false;
     _count = 1;
-    final tempSaleBox = Hive.box('cStocks')
-        .values;
-    if(tempSaleBox.isEmpty){
-      setState(() {
-        _invoice = 1;
-      });
-    }else{
-      setState(() {
-        _invoice = int.parse(tempSaleBox.last.invoice) + 1;
-      });
-    }
 
     final _tempCompanyList = Hive.box('companies')
         .values
-        .where((c) => c.invoice
-        .toLowerCase()
-        .contains("1"))
+        .where((c) => c.invoice.toLowerCase().contains("1"))
         .toList();
-    for(int i = 0; i< _tempCompanyList.length; i++){
+    for (int i = 0; i < _tempCompanyList.length; i++) {
       final _tempCompany = _tempCompanyList[i] as Company;
       _companyNameList.add(_tempCompany.name);
       _companyContactList.add(_tempCompany.contact);
@@ -67,6 +56,40 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+     final truckNumberField = Container(
+        width: MediaQuery.of(context).size.width / 4,
+        child: TextFormField(
+            cursorColor: Colors.blue,
+            autofocus: false,
+            controller: truckNumberEditingController,
+            keyboardType: TextInputType.name,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return ("Truck Plate Number cannot be empty!!");
+              }
+              return null;
+            },
+            onSaved: (value) {
+              truckNumberEditingController.text = value!;
+            },
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(
+                20,
+                15,
+                20,
+                15,
+              ),
+              labelText: 'Truck Plate Number',
+              labelStyle: TextStyle(color: Colors.blue),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.blue),
+              ),
+            )));
     final pickDate = Container(
       child: Row(
         children: [
@@ -113,7 +136,7 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
                     : DateFormat('dd-MMM-yyyy').format(_date!),
                 textAlign: TextAlign.center,
                 style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           )
@@ -203,7 +226,7 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
             keyboardType: TextInputType.name,
             validator: (value) {
               if (value!.isEmpty) {
-                return ("Ton cannot be empty!!");
+                return ("CFT cannot be empty!!");
               }
               return null;
             },
@@ -218,7 +241,7 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
                 20,
                 15,
               ),
-              labelText: 'Ton',
+              labelText: 'CFT',
               labelStyle: TextStyle(color: Colors.blue),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -262,8 +285,8 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
             )));
 
     final addButton = Material(
-      elevation: (_process!)? 0 : 5,
-      color: (_process!)? Colors.blue.shade800 :Colors.blue,
+      elevation: (_process!) ? 0 : 5,
+      color: (_process!) ? Colors.blue.shade800 : Colors.blue,
       borderRadius: BorderRadius.circular(30),
       child: MaterialButton(
         padding: EdgeInsets.fromLTRB(
@@ -278,28 +301,43 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
             _process = true;
             _count = (_count! - 1);
           });
-          (_count! < 0) ?      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Wait Please!!")))
-              :
-          AddData();
+          (_count! < 0)
+              ? ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  backgroundColor: Colors.red, content: Text("Wait Please!!")))
+              : AddData();
         },
-        child:(_process!)? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Processing',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
-            ),
-            SizedBox(width: 20,),
-            Center(child: SizedBox(height:15, width: 15,child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))),
-          ],
-        )
+        child: (_process!)
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Processing',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Center(
+                      child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ))),
+                ],
+              )
             : Text(
-          'Add New Stock',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+                'Add New Stock',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
       ),
     );
 
@@ -340,8 +378,6 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
               });
             }));
 
-
-
     DropdownMenuItem<String> buildMenuName(String item) => DropdownMenuItem(
         value: item,
         child: Text(
@@ -379,19 +415,16 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
 
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.name.contains(newValue!)){
+                  if (_tempCompany.name.contains(newValue!)) {
                     _chosenCompanyContact = _tempCompany.contact;
                   }
                 }
               });
             }));
-
 
     DropdownMenuItem<String> buildMenuContact(String item) => DropdownMenuItem(
         value: item,
@@ -428,23 +461,18 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
               setState(() {
                 _chosenCompanyContact = newValue;
 
-
                 final _tempCompanyList = Hive.box('companies')
                     .values
-                    .where((c) => c.invoice
-                    .toLowerCase()
-                    .contains("1"))
+                    .where((c) => c.invoice.toLowerCase().contains("1"))
                     .toList();
-                for(int i = 0; i< _tempCompanyList.length; i++){
+                for (int i = 0; i < _tempCompanyList.length; i++) {
                   final _tempCompany = _tempCompanyList[i] as Company;
-                  if(_tempCompany.contact.contains(newValue!)){
+                  if (_tempCompany.contact.contains(newValue!)) {
                     _chosenCompanyName = _tempCompany.name;
                   }
                 }
               });
             }));
-
-
 
     return Scaffold(
       appBar: AppBar(
@@ -462,11 +490,15 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+                    pickDate,
+                     SizedBox(
+                      height: 20,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         truckCountField,
-                        pickDate,
+                        truckNumberField,
                       ],
                     ),
                     SizedBox(
@@ -484,10 +516,7 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        nameDropdown,
-                        contactDropdown
-                      ],
+                      children: [nameDropdown, contactDropdown],
                     ),
                     SizedBox(
                       height: 20,
@@ -515,52 +544,148 @@ class _CrusherStockEntryScreenState extends State<CrusherStockEntryScreen> {
   }
 
   void AddData() {
-    if (_formKey.currentState!.validate() && _chosenPort != null&& _date != null && _chosenCompanyName != null && _chosenCompanyContact != null ) {
+    if (_formKey.currentState!.validate() &&
+        _chosenPort != null &&
+        _date != null &&
+        _chosenCompanyName != null &&
+        _chosenCompanyContact != null) {
       final cStockBox = Hive.box('cStocks');
-      final _cftS = double.parse(tonEditingController.text) * 22;
-      final _cftT = double.parse(tonEditingController.text) * 25;
-      final _threeToFourS = (_cftS * 54) / 100 ;
-      final _threeToFourT = (_cftT * 55) / 100 ;
-      final _oneToSixS = (_cftS * 29) / 100 ;
-      final _oneToSixT = (_cftT * 30) / 100 ;
-      final _halfS = (_cftS * 17) / 100 ;
-      final _halfT = (_cftT * 15) / 100 ;
-      final _fiveToTenS = (_cftS * 7) / 100 ;
-      final _fiveToTenT = (_cftT * 7) / 100 ;
-      final _totalS = _threeToFourS + _oneToSixS +_halfS + _fiveToTenS;
-      final _totalT = _threeToFourT + _oneToSixT +_halfT + _fiveToTenT;
+      final _cftS = double.parse(tonEditingController.text);
+      final _cftT = double.parse(tonEditingController.text);
+      final _threeToFourS = (_cftS * 54) / 100;
+      final _threeToFourT = (_cftT * 55) / 100;
+      final _oneToSixS = (_cftS * 29) / 100;
+      final _oneToSixT = (_cftT * 30) / 100;
+      final _halfS = (_cftS * 17) / 100;
+      final _halfT = (_cftT * 15) / 100;
+      final _fiveToTenS = (_cftS * 7) / 100;
+      final _fiveToTenT = (_cftT * 7) / 100;
+      final _totalS = _threeToFourS + _oneToSixS + _halfS + _fiveToTenS;
+      final _totalT = _threeToFourT + _oneToSixT + _halfT + _fiveToTenT;
       final _extraS = _totalS - _cftS;
       final _extraT = _totalT - _cftT;
-
 
       final _priceS = _cftS * double.parse(rateEditingController.text);
       final _priceT = _cftT * double.parse(rateEditingController.text);
 
-      if(_chosenPort == "Shutarkandi"){
-        final cStockModel = CStock(_invoice.toString(), DateFormat('dd-MMM-yyyy').format(_date!),truckCountEditingController.text,_chosenPort!,tonEditingController.text,_cftS.toString(),_threeToFourS.toString(),_oneToSixS.toString(),_halfS.toString(),_fiveToTenS.toString(),_totalS.toString(),_extraS.toString(),remarksEditingController.text,_chosenCompanyName!, _chosenCompanyContact!,DateFormat('MMM-yyyy').format(_date!), rateEditingController.text, _priceS.toString());
+      if (_chosenPort == "Shutarkandi") {
+        final tempSaleBox = Hive.box('cStocks')
+            .values
+            .where((c) => c.port.toLowerCase().contains("shutarkandi"))
+            .toList();
+
+        if (tempSaleBox.isEmpty) {
+          setState(() {
+            _invoice = 1;
+          });
+        } else {
+          setState(() {
+            _invoice = int.parse(tempSaleBox.last.invoice) + 1;
+          });
+        }
+
+        final cStockModel = CStock(
+            _invoice.toString(),
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            truckCountEditingController.text,
+            _chosenPort!,
+            tonEditingController.text,
+            _cftS.toString(),
+            _threeToFourS.toString(),
+            _oneToSixS.toString(),
+            _halfS.toString(),
+            _fiveToTenS.toString(),
+            _totalS.toString(),
+            _extraS.toString(),
+            remarksEditingController.text,
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            DateFormat('MMM-yyyy').format(_date!),
+            rateEditingController.text,
+            _priceS.toString(),
+            truckNumberEditingController.text);
         cStockBox.add(cStockModel);
-        final companyModel = Company("0", _chosenCompanyName!, _chosenCompanyContact!, "0", "0" , "0","Crusher Sale", "2", "0", "0",  DateFormat('dd-MMM-yyyy').format(_date!),DateFormat('yyyy').format(_date!));
+        final companyModel = Company(
+            "crusherstockshutarkandi" + _invoice.toString(),
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            "0",
+            "0",
+            "0",
+            "Crusher Stock Shutarkandi",
+            "2",
+            "0",
+            "0",
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            DateFormat('yyyy').format(_date!));
         Hive.box('companies').add(companyModel);
-      }else{
-        final cStockModel = CStock(_invoice.toString(), DateFormat('dd-MMM-yyyy').format(_date!),truckCountEditingController.text,_chosenPort!,tonEditingController.text,_cftT.toString(),_threeToFourT.toString(),_oneToSixT.toString(),_halfT.toString(),_fiveToTenT.toString(),_totalT.toString(),_extraT.toString(),remarksEditingController.text,_chosenCompanyName!, _chosenCompanyContact!,DateFormat('yyyy').format(_date!), rateEditingController.text, _priceT.toString());
+      } else {
+        final tempSaleBox = Hive.box('cStocks')
+            .values
+            .where((c) => c.port.toLowerCase().contains("tamabil"))
+            .toList();
+        if (tempSaleBox.isEmpty) {
+          setState(() {
+            _invoice = 1;
+          });
+        } else {
+          setState(() {
+            _invoice = int.parse(tempSaleBox.last.invoice) + 1;
+          });
+        }
+
+        final cStockModel = CStock(
+            _invoice.toString(),
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            truckCountEditingController.text,
+            _chosenPort!,
+            tonEditingController.text,
+            _cftT.toString(),
+            _threeToFourT.toString(),
+            _oneToSixT.toString(),
+            _halfT.toString(),
+            _fiveToTenT.toString(),
+            _totalT.toString(),
+            _extraT.toString(),
+            remarksEditingController.text,
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            DateFormat('yyyy').format(_date!),
+            rateEditingController.text,
+            _priceT.toString(),
+               truckNumberEditingController.text);
         cStockBox.add(cStockModel);
-        final companyModel = Company("0", _chosenCompanyName!, _chosenCompanyContact!, "0", "0" , "0","Crusher Sale", "2", "0", "0",  DateFormat('dd-MMM-yyyy').format(_date!),DateFormat('yyyy').format(_date!));
+        final companyModel = Company(
+            "crusherstocktamabil" + _invoice.toString(),
+            _chosenCompanyName!,
+            _chosenCompanyContact!,
+            "0",
+            "0",
+            "0",
+            "Crusher Stock Tamabil",
+            "2",
+            "0",
+            "0",
+            DateFormat('dd-MMM-yyyy').format(_date!),
+            DateFormat('yyyy').format(_date!));
         Hive.box('companies').add(companyModel);
       }
 
       setState(() {
         _process = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.green,content: Text("Entry Added!!")));
-      if(_chosenPort == "Tamabil"){
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => CrusherStockTScreen()));
-      }else{
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => CrusherStockSScreen()));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.green, content: Text("Entry Added!!")));
+      if (_chosenPort == "Tamabil") {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => CrusherStockTScreen()));
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => CrusherStockSScreen()));
       }
-    }else{
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: Colors.red,content: Text("Something Wrong!!")));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: Colors.red, content: Text("Something Wrong!!")));
       setState(() {
         _process = false;
         _count = 1;

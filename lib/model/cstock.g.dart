@@ -35,13 +35,14 @@ class CStockAdapter extends TypeAdapter<CStock> {
       fields[15] as String,
       fields[16] as String,
       fields[17] as String,
+      fields[18] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, CStock obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.invoice)
       ..writeByte(1)
@@ -77,7 +78,9 @@ class CStockAdapter extends TypeAdapter<CStock> {
       ..writeByte(16)
       ..write(obj.rate)
       ..writeByte(17)
-      ..write(obj.price);
+      ..write(obj.price)
+      ..writeByte(18)
+      ..write(obj.truckNumber);
   }
 
   @override
