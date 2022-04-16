@@ -542,18 +542,18 @@ class _CrusherSaleSScreenState extends State<CrusherSaleSScreen> {
 
   void generatePdf() async {
     final _list = <CrusherSaleItem>[];
-    final cStockBox = Hive.box('cStocks')
+    final cStockBox = Hive.box('cSales')
         .values
         .where((c) => c.port.toLowerCase().contains("shutarkandi"))
         .toList();
     for (int i = 0; i < cStockBox.length; i++) {
-      final _temp = cStockBox[i] as CStock;
+      final _temp = cStockBox[i] as CSale;
       _list.add(new CrusherSaleItem(
           _temp.date,
           _temp.truckCount,
           _temp.port,
-          _temp.supplierName,
-          _temp.supplierContact,
+          _temp.buyerContact,
+          _temp.buyerName,
           _temp.cft,
           _temp.rate,
           _temp.price,

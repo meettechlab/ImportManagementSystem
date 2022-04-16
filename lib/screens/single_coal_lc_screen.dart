@@ -533,7 +533,7 @@ class _SingleCoalLCScreenState extends State<SingleCoalLCScreen> {
     final _list = <CoalItem>[];
     final coalBox = Hive.box('coals')
         .values
-        .where((c) => c.lc.toLowerCase() == ("sale"))
+        .where((c) => c.lc.toLowerCase() == widget.coalModel.lc)
         .toList();
     for (int i = 0; i < coalBox.length; i++) {
       final _temp = coalBox[i] as Coal;
